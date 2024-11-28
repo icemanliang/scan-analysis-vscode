@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       scan-analysis-lib:
-        specifier: ^0.2.0
-        version: 0.2.0(@babel/core@7.26.0)
+        specifier: ^0.3.0
+        version: 0.3.0(@babel/core@7.26.0)
     devDependencies:
       '@types/vscode':
         specifier: ^1.80.0
@@ -2069,8 +2069,8 @@ packages:
     resolution: {integrity: sha512-b3rppTKm9T+PsVCBEOUR46GWI7fdOs00VKZ1+9c1EWDaDMvjQc6tUwuFyIprgGgTcWoVHSKrU8H31ZHA2e0RHA==}
     engines: {node: '>=10'}
 
-  scan-analysis-lib@0.2.0:
-    resolution: {integrity: sha512-dk+mjcbgAwZ1VlhMRuq6HSmji870ym337WCvIlGGHc67XqoOkVwsXjJJwBvrRENRvDR46FxGLNHzM2tyxNT8yw==}
+  scan-analysis-lib@0.3.0:
+    resolution: {integrity: sha512-0k1KNeJ2bjuy0jcYoqaOQwCaMG0ki1LVvbMuuSV40tXFi7+6BC/wP2UHabAlkTE8k1adDzMdp/HHVlJAXhar0Q==}
     hasBin: true
 
   semver@5.7.2:
@@ -4814,7 +4814,7 @@ snapshots:
 
   safe-stable-stringify@2.5.0: {}
 
-  scan-analysis-lib@0.2.0(@babel/core@7.26.0):
+  scan-analysis-lib@0.3.0(@babel/core@7.26.0):
     dependencies:
       '@babel/eslint-parser': 7.25.9(@babel/core@7.26.0)(eslint@8.57.1)
       '@babel/parser': 7.26.2

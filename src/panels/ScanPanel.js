@@ -4,11 +4,22 @@ const scanService = require('../services/scanService');
 
 class ScanPanel {
     static currentPanel;
+    static viewType = 'codeScan';
 
     constructor(panel, extensionUri) {
         this._panel = panel;
         this._extensionUri = extensionUri;
         this._disposables = [];
+
+        this._panel.onDidChangeViewState(
+            e => {
+                if (this._panel.visible) {
+                    this._update();
+                }
+            },
+            null,
+            this._disposables
+        );
 
         this._update();
         this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
@@ -24,13 +35,16 @@ class ScanPanel {
             return;
         }
 
+        // 创建webview面板
         const panel = vscode.window.createWebviewPanel(
-            'codeScan',
+            ScanPanel.viewType,
             '代码扫描分析',
             column || vscode.ViewColumn.One,
             {
                 enableScripts: true,
-                localResourceRoots: [extensionUri]
+                retainContextWhenHidden: true,
+                localResourceRoots: [extensionUri],
+                enableDevTools: true
             }
         );
 
@@ -46,34 +60,18 @@ class ScanPanel {
 
     // 添加获取 webview 内容的方法
     async _getWebviewContent(webview) {
-        // 返回基本的 HTML 结构
-        return `
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>代码扫描分析</title>
-            </head>
-            <body>
-                <button id="startScan">开始扫描</button>
-                <div id="results"></div>
-                <script>
-                    const vscode = acquireVsCodeApi();
-                    document.getElementById('startScan').addEventListener('click', () => {
-                        vscode.postMessage({ command: 'startScan' });
-                    });
-                    window.addEventListener('message', event => {
-                        const message = event.data;
-                        if (message.command === 'scanComplete') {
-                            document.getElementById('results').innerHTML = 
-                                JSON.stringify(message.results, null, 2);
-                        }
-                    });
-                </script>
-            </body>
-            </html>
-        `;
+        // 获取文件路径
+        // const htmlPath = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'src', 'panels', 'webview', 'index.html'));
+        const stylePath = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'src', 'panels', 'webview', 'styles.css'));
+        const scriptPath = webview.asWebviewUri(vscode.Uri.joinPath(this._extensionUri, 'src', 'panels', 'webview', 'script.js'));
+        
+        // 读取文件内容
+        const htmlContent = await vscode.workspace.fs.readFile(vscode.Uri.joinPath(this._extensionUri, 'src', 'panels', 'webview', 'index.html'));
+        
+        // 替换文件路径
+        return htmlContent.toString()
+            .replace('${stylePath}', stylePath)
+            .replace('${scriptPath}', scriptPath);
     }
 
     _setWebviewMessageListener(webview) {
@@ -108,7 +106,7 @@ class ScanPanel {
                                         { name: 'eslint-check-plugin', config: {} },
                                         { name: 'stylelint-check-plugin', config: {} },
                                         { name: 'count-check-plugin', config: {} },
-                                        // { name: 'redundancy-check-plugin', config: { maxFilesLimit: 15000 } },
+                                        { name: 'redundancy-check-plugin', config: { maxFilesLimit: 15000 } },
                                         { name: 'git-check-plugin', config: {} },
                                         { name: 'config-check-plugin', config: { npmrc: { registryDomain: 'https://npmjs.iceman.cn' } } },
                                         { name: 'package-check-plugin', config: { privatePackagePrefix: ['@shein'], riskThreshold: { isCheck: false } } },
@@ -117,17 +115,30 @@ class ScanPanel {
                                     ]
                                 };
 
-                                const results = await scanService.scanProject(scanOptions);
-                                progress.report({ increment: 100 });
+                                try {
+                                    const results = await scanService.scanProject(scanOptions);
+                                    const scanResultsFilePath = results.scanResults[0].resultFile;
+                                    // console.log(scanResultsFilePath);
+                                    const scanResultsFileContent = await vscode.workspace.fs.readFile(vscode.Uri.file(scanResultsFilePath));
+                                    const scanResultsFileContentString = Buffer.from(scanResultsFileContent).toString('utf-8');
+                                    // console.log(scanResultsFileContentString);
+                                    progress.report({ increment: 100 });
 
-                                webview.postMessage({
-                                    command: 'scanComplete',
-                                    results: results
-                                });
+                                    webview.postMessage({
+                                        command: 'scanComplete',
+                                        results: scanResultsFileContentString
+                                    });
+                                } catch (error) {
+                                    console.error('扫描失败:', error);
+                                    vscode.window.showErrorMessage(`扫描失败: ${error.message || '未知错误'}`);
+                                }
                             });
                         } catch (error) {
                             vscode.window.showErrorMessage(`扫描失败: ${error.message || '未知错误'}`);
                         }
+                    break;
+                    case 'log':
+                        console.log(message.text);
                         break;
                 }
             },

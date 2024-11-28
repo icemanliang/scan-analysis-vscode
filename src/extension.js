@@ -1,6 +1,5 @@
 const vscode = require('vscode');
 const { ScanPanel } = require('./panels/ScanPanel');
-// const { SidebarProvider } = require('./providers/SidebarProvider');
 
 function activate(context) {
 
