@@ -117,10 +117,10 @@ function formatEslintInfo(eslintInfo) {
     if (!eslintInfo) return '<p>无分析数据</p>';
 
     // 先添加 toggle 函数到 window 对象
-    if (!window.toggleMessageList) {
-        window.toggleMessageList = function(header) {
+    if (!window.toggleEslintMessageList) {
+        window.toggleEslintMessageList = function(header) {
             const fileItem = header.parentElement;
-            const messageList = fileItem.querySelector('.message-list');
+            const messageList = fileItem.querySelector('.eslint-file__messages');
             const toggleIcon = header.querySelector('.toggle-icon');
             
             if (messageList.style.display === 'none') {
@@ -134,7 +134,7 @@ function formatEslintInfo(eslintInfo) {
 
         // 初始化所有消息列表的显示状态
         setTimeout(() => {
-            document.querySelectorAll('.message-list').forEach(list => {
+            document.querySelectorAll('.eslint-file__messages').forEach(list => {
                 list.style.display = 'none';
             });
         }, 0);
@@ -142,16 +142,16 @@ function formatEslintInfo(eslintInfo) {
 
     const summary = `
         <div class="summary-section">
-            <div class="summary-stats">
-                <div class="stat-item">
+            <div class="eslint-summary">
+                <div class="eslint-stat">
                     <span class="stat-label">总文件数：</span>
                     <span class="stat-value">${eslintInfo.totalFilesCount}</span>
                 </div>
-                <div class="stat-item error">
+                <div class="eslint-stat eslint-stat--error">
                     <span class="stat-label">错误数：</span>
                     <span class="stat-value">${eslintInfo.errorCount}</span>
                 </div>
-                <div class="stat-item warning">
+                <div class="eslint-stat eslint-stat--warning">
                     <span class="stat-label">警告数：</span>
                     <span class="stat-value">${eslintInfo.warningCount}</span>
                 </div>
@@ -162,8 +162,8 @@ function formatEslintInfo(eslintInfo) {
         <div class="file-list-section">
             <h3>违规详情</h3>
             ${eslintInfo.fileList.map(file => `
-                <div class="file-item ${file.errorCount > 0 ? 'has-error' : ''} ${file.warningCount > 0 ? 'has-warning' : ''}">
-                    <div class="file-header" onclick="window.toggleMessageList(this)">
+                <div class="eslint-file ${file.errorCount > 0 ? 'has-error' : ''} ${file.warningCount > 0 ? 'has-warning' : ''}">
+                    <div class="eslint-file__header" onclick="window.toggleEslintMessageList(this)">
                         <span class="toggle-icon">▼</span>
                         <span class="file-path">${file.file}</span>
                         <span class="file-stats">
@@ -171,9 +171,9 @@ function formatEslintInfo(eslintInfo) {
                             <span class="warning-count">${file.warningCount} 警告</span>
                         </span>
                     </div>
-                    <div class="message-list">
+                    <div class="eslint-file__messages">
                         ${file.messages.map(msg => `
-                            <div class="message-item ${msg.severity === 2 ? 'error' : 'warning'}">
+                            <div class="eslint-message ${msg.severity === 2 ? 'eslint-message--error' : 'eslint-message--warning'}">
                                 <span class="message-rule">${msg.rule}</span>
                                 <span class="message-text">${msg.message}</span>
                                 <span class="message-line">行 ${msg.line}</span>
@@ -192,10 +192,10 @@ function formatStylelintInfo(stylelintInfo) {
     if (!stylelintInfo) return '<p>无分析数据</p>';
 
     // 添加 toggle 函数（如果还没有添加）
-    if (!window.toggleMessageList) {
-        window.toggleMessageList = function(header) {
+    if (!window.toggleStylelintMessageList) {
+        window.toggleStylelintMessageList = function(header) {
             const fileItem = header.parentElement;
-            const messageList = fileItem.querySelector('.message-list');
+            const messageList = fileItem.querySelector('.stylelint-file__messages');
             const toggleIcon = header.querySelector('.toggle-icon');
             
             if (messageList.style.display === 'none') {
@@ -210,12 +210,12 @@ function formatStylelintInfo(stylelintInfo) {
 
     const summary = `
         <div class="summary-section">
-            <div class="summary-stats">
-                <div class="stat-item">
+            <div class="stylelint-summary">
+                <div class="stylelint-stat">
                     <span class="stat-label">总文件数：</span>
                     <span class="stat-value">${stylelintInfo.totalFilesCount}</span>
                 </div>
-                <div class="stat-item error">
+                <div class="stylelint-stat stylelint-stat--error">
                     <span class="stat-label">错误数：</span>
                     <span class="stat-value">${stylelintInfo.errorCount}</span>
                 </div>
@@ -226,17 +226,17 @@ function formatStylelintInfo(stylelintInfo) {
         <div class="file-list-section">
             <h3>违规详情</h3>
             ${stylelintInfo.fileList.map(file => `
-                <div class="file-item ${file.errorCount > 0 ? 'has-error' : ''} ${file.warningCount > 0 ? 'has-warning' : ''}">
-                    <div class="file-header" onclick="window.toggleMessageList(this)">
+                <div class="stylelint-file ${file.errorCount > 0 ? 'has-error' : ''} ${file.warningCount > 0 ? 'has-warning' : ''}">
+                    <div class="stylelint-file__header" onclick="window.toggleStylelintMessageList(this)">
                         <span class="toggle-icon">▼</span>
                         <span class="file-path">${file.file}</span>
                         <span class="file-stats">
                             <span class="error-count">${file.errorCount} 错误</span>
                         </span>
                     </div>
-                    <div class="message-list">
+                    <div class="stylelint-file__messages">
                         ${file.messages.map(msg => `
-                            <div class="message-item ${msg.severity === 2 ? 'error' : 'warning'}">
+                            <div class="stylelint-message stylelint-message--error">
                                 <span class="message-rule">${msg.rule || '样式规则'}</span>
                                 <span class="message-text">${msg.text || msg.message}</span>
                                 <span class="message-line">行 ${msg.line}</span>
@@ -249,7 +249,7 @@ function formatStylelintInfo(stylelintInfo) {
 
     // 初始化消息列表的显示状态
     setTimeout(() => {
-        document.querySelectorAll('.message-list').forEach(list => {
+        document.querySelectorAll('.stylelint-file__messages').forEach(list => {
             list.style.display = 'none';
             list.previousElementSibling.querySelector('.toggle-icon').textContent = '▶';
         });
@@ -265,11 +265,11 @@ function formatGitInfo(gitInfo) {
     // 文件类型统计
     const fileStatsHtml = `
         <div class="git-section">
-            <div class="file-stats-grid">
+            <div class="git-stats-grid">
                 ${Object.entries(gitInfo.fileStats || {}).map(([ext, stats]) => `
-                    <div class="stat-card">
-                        <div class="stat-ext">${ext}</div>
-                        <div class="stat-details">
+                    <div class="git-stat-card">
+                        <div class="git-stat-ext">${ext}</div>
+                        <div class="git-stat-details">
                             <div>数量: ${stats.count}</div>
                             <div>大小: ${formatSize(stats.totalSize)}</div>
                         </div>
@@ -412,10 +412,10 @@ function formatConfigInfo(configInfo) {
                                     : `<div class="error-msg">文件不存在</div>`
                                 }
                                 ${config.filePath ? 
-                                    `<div class="file-path">📎 ${config.filePath}</div>` : ''
+                                    `<div class="config-file-path">📎 ${config.filePath}</div>` : ''
                                 }
                                 ${config.version ? 
-                                    `<div class="version-info">📌 ${config.version}</div>` : ''
+                                    `<div class="config-version-info">📌 ${config.version}</div>` : ''
                                 }
                             </div>
                         </div>
@@ -437,20 +437,16 @@ function formatCountInfo(countInfo) {
     const stats = countInfo.functionStats;
     const html = `
         <div class="function-stats-container">
-            <div class="stats-header">
+            <div class="function-stats-header">
                 <h3>函数类型检查统计</h3>
-                <div class="stats-summary">
-                    <div class="stat-item ${stats.missingTypes === 0 ? 'success' : 'warning'}">
-                        <span class="stat-label">总函数数量:</span>
-                        <span class="stat-value">${stats.total}</span>
+                <div class="function-stats-summary">
+                    <div class="function-stat-item ${stats.missingTypes === 0 ? 'success' : 'warning'}">
+                        <span class="function-stat-label">总函数数量:</span>
+                        <span class="function-stat-value">${stats.total}</span>
                     </div>
-                    <div class="stat-item ${stats.missingTypes === 0 ? 'success' : 'warning'}">
-                        <span class="stat-label">缺少类型定义的函数:</span>
-                        <span class="stat-value">${stats.missingTypes}</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">Hooks函数:</span>
-                        <span class="stat-value">${stats.hooks}</span>
+                    <div class="function-stat-item ${stats.missingTypes === 0 ? 'success' : 'warning'}">
+                        <span class="function-stat-label">缺少类型定义的函数:</span>
+                        <span class="function-stat-value">${stats.missingTypes}</span>
                     </div>
                 </div>
             </div>
@@ -458,23 +454,27 @@ function formatCountInfo(countInfo) {
             ${stats.missingTypes > 0 ? `
                 <div class="missing-types-section">
                     <h4>缺少类型定义的函数列表:</h4>
-                    <div class="file-list">
+                    <div class="function-file-list">
                         ${groupByFile(stats.functionsWithMissingTypes).map(({file, functions}) => `
-                            <div class="file-group">
-                                <div class="file-header" onclick="this.parentElement.classList.toggle('expanded')">
-                                    <span class="expand-icon">▶</span>
-                                    <span class="file-path">${file}</span>
-                                    <span class="file-count">(${functions.length})</span>
+                            <div class="function-file-group">
+                                <div class="function-file-header" onclick="this.parentElement.classList.toggle('expanded')">
+                                    <span class="function-expand-icon">▶</span>
+                                    <span class="function-file-path">${file}</span>
+                                    <span class="function-file-count">(${functions.length})</span>
                                 </div>
                                 <div class="function-list">
                                     ${functions.map(fn => `
                                         <div class="function-item">
                                             <span class="function-name">${fn.name === 'anonymous' ? '匿名函数' : fn.name}</span>
-                                            <span class="function-line">第 ${fn.line} 行</span>
                                             ${!fn.hasParameterTypes ? 
-                                                '<span class="type-missing">缺少参数类型</span>' : 
-                                                '<span class="type-exists">参数类型完整</span>'
+                                                '<span class="function-type-missing">缺少参数类型</span>' : 
+                                                ''
                                             }
+                                            ${!fn.hasReturnType ? 
+                                                '<span class="function-type-missing">缺少返回类型</span>' : 
+                                                ''
+                                            }
+                                            <span class="function-line">第 ${fn.line} 行</span>
                                         </div>
                                     `).join('')}
                                 </div>
@@ -503,36 +503,51 @@ function groupByFile(functions) {
 
 // 格式化代码冗余检查数据
 function formatRedundancyInfo(redundancyInfo) {
-    if (!redundancyInfo || !redundancyInfo.statistic) {
+    if (!redundancyInfo) {
         return '<p>无重复代码分析数据</p>';
     }
 
-    const { statistic } = redundancyInfo;
+    // 添加 toggle 函数（如果还没有添加）
+    if (!window.toggleCloneGroup) {
+        window.toggleCloneGroup = function(header) {
+            const fileItem = header.parentElement;
+            const messageList = fileItem.querySelector('.clone-files-list');
+            const toggleIcon = header.querySelector('.clone-arrow');
+            
+            if (messageList.style.display === 'none') {
+                messageList.style.display = 'block';
+                toggleIcon.textContent = '▼';
+            } else {
+                messageList.style.display = 'none';
+                toggleIcon.textContent = '▶';
+            }
+        };
+    }
     
     const html = `
         <div class="redundancy-container">
             <div class="redundancy-header">
                 <h3>代码重复分析</h3>
                 <div class="redundancy-summary">
-                    <div class="stat-item ${statistic.duplicates > 0 ? 'warning' : 'success'}">
-                        <span class="stat-label">总行数:</span>
-                        <span class="stat-value">${statistic.total}</span>
+                    <div class="stat-item ${redundancyInfo.duplicates > 0 ? 'warning' : 'success'}">
+                        <span class="stat-label">检查总文件数:</span>
+                        <span class="stat-value">${redundancyInfo.total}</span>
                     </div>
-                    <div class="stat-item ${statistic.duplicates > 0 ? 'warning' : 'success'}">
-                        <span class="stat-label">重复行数:</span>
-                        <span class="stat-value">${statistic.duplicates}</span>
+                    <div class="stat-item ${redundancyInfo.duplicates > 0 ? 'warning' : 'success'}">
+                        <span class="stat-label">重复项目数:</span>
+                        <span class="stat-value">${redundancyInfo.duplicates}</span>
                     </div>
                     <div class="stat-item">
-                        <span class="stat-label">涉及文件数:</span>
-                        <span class="stat-value">${statistic.files}</span>
+                        <span class="stat-label">波及文件数:</span>
+                        <span class="stat-value">${redundancyInfo.files}</span>
                     </div>
                 </div>
             </div>
 
             <div class="clones-container">
-                ${statistic.clones.map((clone, index) => `
+                ${redundancyInfo.clones.map((clone, index) => `
                     <div class="clone-group">
-                        <div class="clone-header" onclick="toggleCloneGroup(${index})">
+                        <div class="clone-header" onclick="window.toggleCloneGroup(this)">
                             <span class="clone-arrow">▶</span>
                             <span class="clone-title">重复代码块 #${index + 1}</span>
                             <span class="clone-info">
@@ -541,10 +556,10 @@ function formatRedundancyInfo(redundancyInfo) {
                             </span>
                         </div>
                         <div class="clone-files-list">
-                            ${clone.files.map(file => `
+                            ${redundancyInfo.clones[index].files.map(file => `
                                 <div class="clone-file">
-                                    <div class="file-path">${file.name}</div>
-                                    <div class="file-lines">第 ${file.startLine} - ${file.endLine} 行</div>
+                                    <div class="clone-file-path">${file.name}</div>
+                                    <div class="clone-file-lines">第 ${file.startLine} - ${file.endLine} 行</div>
                                 </div>
                             `).join('')}
                         </div>
@@ -553,6 +568,14 @@ function formatRedundancyInfo(redundancyInfo) {
             </div>
         </div>
     `;
+
+     // 初始化消息列表的显示状态
+    setTimeout(() => {
+        document.querySelectorAll('.clone-files-list').forEach(list => {
+            list.style.display = 'none';
+            list.previousElementSibling.querySelector('.clone-arrow').textContent = '▶';
+        });
+    }, 0);
 
     return html;
 }   

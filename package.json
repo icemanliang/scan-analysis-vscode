@@ -2,7 +2,7 @@
   "name": "code-scan",
   "displayName": "Code Scan",
   "description": "代码扫描分析工具",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -20,11 +20,11 @@
     ]
   },
   "dependencies": {
-    "scan-analysis-lib": "^0.3.0"
+    "scan-analysis-lib": "^0.6.0"
   },
   "devDependencies": {
     "@types/vscode": "^1.80.0",
     "@vscode/test-electron": "^2.3.2"
   },
-  "packageManager": "pnpm@9.6.0+sha512.38dc6fba8dba35b39340b9700112c2fe1e12f10b17134715a4aa98ccf7bb035e76fd981cf0bb384dfa98f8d6af5481c2bef2f4266a24bfa20c34eb7147ce0b5e"
+  "packageManager": "pnpm@9.6.0"
 }
