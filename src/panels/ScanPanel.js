@@ -109,8 +109,8 @@ class ScanPanel {
                                         { name: 'redundancy-check-plugin', config: { maxFilesLimit: 15000 } },
                                         { name: 'git-check-plugin', config: {} },
                                         { name: 'config-check-plugin', config: { npmrc: { registryDomain: 'https://npmjs.iceman.cn' } } },
-                                        { name: 'package-check-plugin', config: { privatePackagePrefix: ['@shein'], riskThreshold: { isCheck: false } } },
-                                        { name: 'dependency-check-plugin', config: { ignoreMatch: ['src/component/', '__tests__/'] } },
+                                        { name: 'package-check-plugin', config: {} },
+                                        { name: 'dependency-check-plugin', config: {} },
                                         { name: 'quality-analysis-plugin', config: {} }
                                     ]
                                 };
