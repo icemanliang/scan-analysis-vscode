@@ -108,11 +108,7 @@ class ScanPanel {
                                         { name: 'count-check-plugin', config: {} },
                                         { name: 'redundancy-check-plugin', config: { maxFilesLimit: 15000 } },
                                         { name: 'git-check-plugin', config: {} },
-<<<<<<< HEAD
-                                        { name: 'config-check-plugin', config: { npmrc: { registryDomain: 'https://npmjs.iceman.cn' } } },
-=======
                                         { name: 'config-check-plugin', config: {} },
->>>>>>> f7734694a49a94a4d14afd3dd7ebb885fcc61c35
                                         { name: 'package-check-plugin', config: {} },
                                         { name: 'dependency-check-plugin', config: {} },
                                         { name: 'quality-analysis-plugin', config: {} }
